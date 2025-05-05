@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Store Website</title>
+<style>
+  /* Reset and base */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body, html {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f9f9f9;
+    color: #222;
+    line-height: 1.5;
+    height: 100vh;
+    overflow-x: hidden;
+  }
+  a {
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  a:hover, a:focus {
+    color: #0056b3;
+  }
+
+  /* Container for page content with bottom padding for menu, banner, footer */
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px 20px 180px; /* bottom padding for bottom-menu + banner + footer */
+  }
+
+  /* Offer Banner moved inside main at top */
+  .offer-banner {
+    width: 100%;
+    max-width: 1100px;
+    background: #ff5722;
+    color: white;
+    text-align: center;
+    padding: 14px 20px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+
+  /* Hero heading */
+  .hero {
+    text-align: center;
+    background: linear-gradient(90deg, #007bff 0%, #00aaff 100%);
+    color: white;
+    border-radius: 8px;
+    padding: 40px 20px;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+
+  /* Filter bar */
+  .filter-bar {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    margin-bottom: 25px;
+    padding-bottom: 5px;
+  }
+  .filter-bar::-webkit-scrollbar {
+    height: 6px;
+  }
+  .filter-bar::-webkit-scrollbar-thumb {
+    background: #007bff;
+    border-radius: 3px;
+  }
+  .filter-btn {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    font-weight: 600;
+    border-radius: 20px;
+    cursor: pointer;
+    border: none;
+    user-select: none;
+    transition: background-color 0.3s;
+    white-space: nowrap;
+  }
+  .filter-btn:hover, .filter-btn:focus {
+    background-color: #0056b3;
+  }
+  .filter-btn.active {
+    background-color: #004080;
+  }
+
+  /* Products section */
+  .products {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
+    gap: 20px;
+  }
+  .product-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgb(0 0 0 / 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    transition: transform 0.3s;
+  }
+  .product-card:hover, .product-card:focus-within {
+    transform: translateY(-5px);
+  }
+  .product-card.hidden {
+    display: none !important;
+  }
+  /* Container for multiple images in product */
+  .product-img-container {
+    position: relative;
+    width: 120px;
+    height: 90px;
+    margin: 15px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .product-img-container img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 6px;
+    transition: opacity 0.4s ease;
+    opacity: 0;
+  }
+  .product-img-container img.active {
+    opacity: 1;
+    position: relative;
+  }
+  .product-info {
+    padding: 15px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .product-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #333;
+  }
+  .product-desc {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 12px;
+  }
+  .product-price {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #007bff;
+    margin-bottom: 12px;
+  }
+  .order-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    border: none;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-decoration: none;
+    user-select: none;
+    display: inline-block;
+    align-self: flex-start;
+  }
+  .order-btn:hover, .order-btn:focus {
+    background-color: #0056b3;
+  }
+
+  /* Stack product card vertically on very small screens */
+  @media (max-width: 400px) {
+    .products {
+      grid-template-columns: 1fr;
+    }
+    .product-card {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .product-img-container {
+      width: 100%;
+      height: 180px;
+      margin: 0 0 12px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      position: relative;
+    }
+    .product-img-container img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .order-btn {
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  /* Contact section */
+  #contact {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+  }
+  #contact h2 {
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: #007bff;
+  }
+  #contact p a {
+    margin-left: 5px;
+  }
+
+  /* Footer */
+  footer.site-footer {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px 20px 40px;
+    text-align: center;
+    background-color: #000;
+    color: #fff;
+    border-radius: 0 0 8px 8px;
+  }
+  footer.site-footer .logo-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.4rem;
+  }
+  footer.site-footer .logo-footer img {
+    height: 36px;
+    width: 36px;
+    border-radius: 6px;
+  }
+  footer.site-footer small {
+    display: block;
+    font-size: 0.9rem;
+    color: #ccc;
+  }
+
+  /* Bottom fixed menu bar - store button removed */
+  nav.bottom-menu {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    background: white;
+    border-top: 1px solid #ddd;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 60px;
+    z-index: 10002;
+  }
+  nav.bottom-menu > a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.75rem;
+    color: #007bff;
+    font-weight: 600;
+    text-decoration: none;
+    user-select: none;
+    outline-offset: 3px;
+  }
+  nav.bottom-menu > a:focus {
+    outline: 2px solid #0056b3;
+    border-radius: 5px;
+  }
+  nav.bottom-menu > a:hover {
+    color: #0056b3;
+  }
+  nav.bottom-menu svg {
+    margin-bottom: 3px;
+    height: 20px;
+    width: 20px;
+    fill: currentColor;
+  }
+
+  /* Filter bar */
+  .filter-bar {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    margin-bottom: 25px;
+    padding-bottom: 5px;
+  }
+  .filter-bar::-webkit-scrollbar {
+    height: 6px;
+  }
+  .filter-bar::-webkit-scrollbar-thumb {
+    background: #007bff;
+    border-radius: 3px;
+  }
+  .filter-btn {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    font-weight: 600;
+    border-radius: 20px;
+    cursor: pointer;
+    border: none;
+    user-select: none;
+    transition: background-color 0.3s;
+    white-space: nowrap;
+  }
+  .filter-btn:hover, .filter-btn:focus {
+    background-color: #0056b3;
+  }
+  .filter-btn.active {
+    background-color: #004080;
+  }
+
+  /* Responsive tweaks */
+  @media (min-width: 700px) {
+    nav.bottom-menu {
+      display: none; /* hide bottom menu on larger screens */
+    }
+  }
+  @media (min-width: 700px) {
+    main {
+      padding-bottom: 40px;
+    }
+  }
+</style>
+</head>
+<body>
+<main>
+  <!-- Offer Banner moved inside main at top -->
+  <div class="offer-banner" role="region" aria-live="polite" aria-label="Special Offers">
+    🔥 Special Offer: Get 20% off on all watches! Use code WATCH20 at checkout.
+  </div>
+
+  <section class="hero" aria-label="Hero Section">
+    Welcome to Our Store - Best Products, Great Prices!
+  </section>
+
+  <!-- Filter Bar -->
+  <section class="filter-bar" aria-label="Product Categories Filter" role="group">
+    <button class="filter-btn active" data-filter="all" aria-pressed="true">All</button>
+    <button class="filter-btn" data-filter="watches" aria-pressed="false">Watches</button>
+    <button class="filter-btn" data-filter="headphones" aria-pressed="false">Headphones</button>
+    <button class="filter-btn" data-filter="wallets" aria-pressed="false">Wallets</button>
+  </section>
+
+  <section id="products" class="products" aria-label="Products Section">
+    <!-- Product with multiple images -->
+    <article class="product-card" tabindex="0" data-category="watches">
+      <div class="product-img-container" tabindex="0" aria-label="Product images for Classic Watch. Click to cycle images.">
+        <img src="https://images.pexels.com/photos/715688/pexels-photo-715688.jpeg?auto=compress&amp;cs=tinysrgb&amp;dpr=2&amp;h=120" alt="Classic Watch Image 1" class="active" />
+        <img src="https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?auto=compress&amp;cs=tinysrgb&amp;dpr=2&amp;h=120" alt="Classic Watch Image 2" />
+        <img src="https://images.pexels.com/photos/277395/pexels-photo-277395.jpeg?auto=compress&amp;cs=tinysrgb&amp;dpr=2&amp;h=120" alt="Classic Watch Image 3" />
+      </div>
+      <div class="product-info">
+        <h3 class="product-name">Classic Watch</h3>
+        <p class="product-desc">Elegant analog watch with leather band and stainless steel case. Perfect for any occasion.</p>
+        <p class="product-price">$120.00</p>
+        <a href="mailto:orders@example.com?subject=Inquiry%20Classic%20Watch" class="order-btn" aria-label="Inquiry Classic Watch">Inquiry Now</a>
+      </div>
+    </article>
+
+    <!-- Other products single image -->
+    <article class="product-card" tabindex="0" data-category="headphones">
+      <div class="product-img-container" tabindex="0" aria-label="Wireless Headphones image">
+        <img src="https://images.pexels.com/photos/298864/pexels-photo-298864.jpeg?auto=compress&amp;cs=tinysrgb&amp;dpr=2&amp;h=120" alt="Wireless Headphones" class="active" />
+      </div>
+      <div class="product-info">
+        <h3 class="product-name">Wireless Headphones</h3>
+        <p class="product-desc">High-quality wireless headphones with noise cancellation and long battery life.</p>
+        <p class="product-price">$80.00</p>
+        <a href="mailto:orders@example.com?subject=Inquiry%Wireless%20Headphones" class="order-btn" aria-label="Inquiry Wireless Headphones">Inquiry Now</a>
+      </div>
+    </article>
+
+    <article class="product-card" tabindex="0" data-category="wallets">
+      <div class="product-img-container" tabindex="0" aria-label="Leather Wallet image">
+        <img src="https://images.pexels.com/photos/845451/pexels-photo-845451.jpeg?auto=compress&amp;cs=tinysrgb&amp;dpr=2&amp;h=120" alt="Leather Wallet" class="active" />
+      </div>
+      <div class="product-info">
+        <h3 class="product-name">Leather Wallet</h3>
+        <p class="product-desc">Compact genuine leather wallet with multiple card slots and coin pocket.</p>
+        <p class="product-price">$45.00</p>
+        <a href="mailto:orders@example.com?subject=Inquiry%20Leather%20Wallet" class="order-btn" aria-label="Inquiry Leather Wallet">Inquiry Now</a>
+      </div>
+    </article>
+  </section>
+
+  <section id="contact" aria-label="Contact Section">
+    <h2>Contact Us</h2>
+    <p>If you have any questions or want to place an order, email us at
+      <a href="mailto:orders@example.com" aria-label="Email orders@example.com">orders@example.com</a>
+    </p>
+  </section>
+</main>
+
+<footer class="site-footer" role="contentinfo" aria-label="Site Footer">
+  <div class="logo-footer" tabindex="0" aria-label="Store Logo">
+    <img src="https://images.pexels.com/photos/3184405/pexels-photo-3184405.jpeg?auto=compress&amp;cs=tinysrgb&amp;dpr=1&amp;w=40" alt="Store Logo" />
+    Store
+  </div>
+  <small>© 2024 Store. All Rights Reserved.</small>
+</footer>
+
+<nav class="bottom-menu" role="navigation" aria-label="Bottom Navigation Menu">
+  <a href="#" aria-label="Home Page" tabindex="0">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    Home
+  </a>
+  <a href="#products" aria-label="Products Section" tabindex="0">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 6V4a4 4 0 0 0-8 0v2H5v14h14V6h-3zM10 4a2 2 0 0 1 4 0v2h-4V4z"/></svg>
+    Products
+  </a>
+  <a href="#contact" aria-label="Contact Section" tabindex="0">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 4h16v16H4z" fill="none"/><path d="M22 6l-10 7L2 6v12h20z"/></svg>
+    Contact
+  </a>
+</nav>
+
+<script>
+  // Filtering functionality
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const productCards = document.querySelectorAll('.product-card');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Update active state
+      filterBtns.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
+
+      const filter = btn.dataset.filter;
+
+      productCards.forEach(card => {
+        if(filter === 'all' || card.dataset.category === filter){
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    });
+  });
+
+  // Image slideshow per product on click
+  document.querySelectorAll('.product-img-container').forEach(container => {
+    const images = container.querySelectorAll('img');
+    let currentIndex = 0;
+    container.tabIndex = 0;
+
+    function showImage(index){
+      images.forEach((img, i) => {
+        if(i === index){
+          img.classList.add('active');
+        } else {
+          img.classList.remove('active');
+        }
+      });
+    }
+    container.addEventListener('click', () => {
+      currentIndex++;
+      if(currentIndex >= images.length) currentIndex = 0;
+      showImage(currentIndex);
+    });
+    container.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        currentIndex++;
+        if(currentIndex >= images.length) currentIndex = 0;
+        showImage(currentIndex);
+      }
+    });
+    showImage(currentIndex);
+  });
+</script>
+</body>
+</html>
+
